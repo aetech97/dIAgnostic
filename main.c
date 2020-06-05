@@ -13,6 +13,7 @@ SYMPTOME* InsererMaillonEnTete(SYMPTOME*, SYMPTOME*);
 void AfficherMaillon(SYMPTOME*);
 void LireFichier(FILE *fic);
 void EcrireFichier(FILE*, SYMPTOME*);
+bool Rechercher(FILE*, char[30]);
 
 SYMPTOME* CreerMaillon(){
   SYMPTOME *pt_maillon = NULL;
@@ -47,18 +48,32 @@ void AfficherMaillon(SYMPTOME *pt_tete)
 
 void LireFichier(FILE *fic){
   SYMPTOME tmp;
-  SYMPTOME *pt_tete = NULL;
 
   fseek(fic, 0, SEEK_SET);
   memset(&tmp, '\0', sizeof(SYMPTOME));
 
   while(fread(&tmp, sizeof(SYMPTOME), 1, fic))
   {
-          //*pt_tete = tmp;
-          printf("%s\n", &(tmp.nom));
-          //AfficherMaillon(&tmp);
+      printf("%s\n", &(tmp.nom));
   }
 }
+
+bool Rechercher(FILE *fic, char to_find[30]){
+  SYMPTOME tmp;
+
+  fseek(fic, 0, SEEK_SET);
+  memset(&tmp, '\0', sizeof(SYMPTOME));
+
+  while(fread(&tmp, sizeof(SYMPTOME), 1, fic))
+  {
+      if(strcmp(&(tmp.nom), to_find) == 0)
+      {
+        return true;
+      }
+  }
+    return false;
+}
+
 
 void EcrireFichier(FILE *fic, SYMPTOME *pt_tete)
 {
@@ -95,6 +110,7 @@ int main()
              "3.Administrer la base de regles 3\n"
              "5.Inserer nouveau symptome dans la bd_symptomes\n"
              "6.Afficher la bd_symptomes\n"
+             "7.Chercher symptome dans la bd de symptomes\n"
              "0.Quitter\n");
 
       c = getchar();
@@ -142,7 +158,6 @@ int main()
 
             while (insert){
               printf("Voulez-vous ajouter un nouvel symptome? (o/n)");
-              /choix = getchar();
               scanf(" %c", &choix);
               if (choix == 'o')
               {
@@ -155,10 +170,8 @@ int main()
 
             AfficherMaillon(pt_tete);
             EcrireFichier(f, pt_tete);
-            //EcrireFichier(f, pt_tete);
             fclose(f);
-           //fin = 1;
-           break;
+            break;
 
           }
 
@@ -167,6 +180,21 @@ int main()
             FILE *f = NULL;
             f = fopen("bd_symptomes.txt", "r");
             LireFichier(f);
+            fclose(f);
+          }
+
+          case '7':
+          {
+            FILE *f = NULL;
+            f = fopen("bd_symptomes.txt", "r");
+            char symptome_a_chercher[30];
+            printf("Veuillez entrer le symptome à chercher : ");
+            scanf("%s", symptome_a_chercher);
+            bool resultat = Rechercher(f, symptome_a_chercher);
+            if(resultat)
+              printf("Trouvé!");
+            else
+              printf("Non trouvé!");
             fclose(f);
           }
 
