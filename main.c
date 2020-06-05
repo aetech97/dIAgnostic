@@ -8,9 +8,31 @@ typedef struct maillon{
     struct maillon *suiv;
 } SYMPTOME;
 
+SYMPTOME* CreerMaillon();
+SYMPTOME* InsererMaillonEnTete(SYMPTOME*, SYMPTOME*);
 void AfficherMaillon(SYMPTOME*);
 SYMPTOME* LireFichier(FILE *fic);
 void EcrireFichier(FILE*, SYMPTOME*);
+
+SYMPTOME* CreerMaillon(){
+  SYMPTOME *pt_maillon = NULL;
+
+  pt_maillon = (SYMPTOME*)malloc(sizeof(SYMPTOME));
+
+  printf("Veuillez entrer un nouveau symptome à la base : ");
+  scanf("%s", pt_maillon->nom);
+
+  pt_maillon->suiv = NULL;
+
+  return pt_maillon;
+}
+
+SYMPTOME* InsererMaillonEnTete(SYMPTOME *pt_tete, SYMPTOME *nouveau)
+{
+    nouveau->suiv = pt_tete;
+    return nouveau;
+}
+
 
 void AfficherMaillon(SYMPTOME *pt_tete)
 {
@@ -67,9 +89,9 @@ void EcrireFichier(FILE *fic, SYMPTOME *pt_tete)
 
 int main(void)
 {
+
+   SYMPTOME *pt_tete_symptomes, *nouvel_element = NULL;
    int fin;
-
-
 
    fin = 0;
    while(!fin)
@@ -80,7 +102,9 @@ int main(void)
       printf("1.Effectuer un diagnostique 1\n"
              "2.Administrer la base de faits 2\n"
              "3.Administrer la base de regles 3\n"
-             "4.Quitter\n");
+             "5.Inserer nouveau symptome dans la bd_symptomes\n"
+             "6.Afficher la bd_symptomes\n"
+             "0.Quitter\n");
 
       c = getchar();
 
@@ -97,25 +121,53 @@ int main(void)
             printf("Choix 1\n");
             break;
 
-
-
          case '2':
             printf("Choix 2\n");
             break;
-
-
 
          case '3':
             printf("Choix 3\n");
             break;
 
-
-
          case '4':
-            fin = 1;
+            //fin = 1;
             break;
 
+        case '5':
 
+            bool insert = true;
+
+            pt_tete = creer_maillon();
+            char choix;
+
+            FILE *f = fopen("file.txt", "w");
+            if (f == NULL)
+            {
+                printf("Error opening file!\n");
+                exit(1);
+            }
+
+            while (insert){
+              printf("Voulez-vous ajouter un nouvel symptome? (o/n)");
+              //choix = getchar();
+              scanf(" %c", &choix);
+              if (choix == 'o')
+              {
+                nouvel_element = creer_maillon();
+                InsererMaillonEnTete(&nouvel_element, pt_tete);
+                EcrireFichier(f, pt_tete);
+              } else {
+                insert = false;
+              }
+            }
+
+            AfficherMaillon(pt_tete);
+           //fin = 1;
+           break;
+
+         case '0':
+            fin = 1;
+            break;
 
          default:
             printf("Choix errone\n");
