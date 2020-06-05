@@ -11,7 +11,7 @@ typedef struct maillon{
 SYMPTOME* CreerMaillon();
 SYMPTOME* InsererMaillonEnTete(SYMPTOME*, SYMPTOME*);
 void AfficherMaillon(SYMPTOME*);
-SYMPTOME* LireFichier(FILE *fic);
+void LireFichier(FILE *fic);
 void EcrireFichier(FILE*, SYMPTOME*);
 
 SYMPTOME* CreerMaillon(){
@@ -37,38 +37,26 @@ SYMPTOME* InsererMaillonEnTete(SYMPTOME *pt_tete, SYMPTOME *nouveau)
 void AfficherMaillon(SYMPTOME *pt_tete)
 {
   if (!pt_tete)
-  {
     printf("\nLa liste est vide!");
-    while(pt_tete)
-    {
-        printf("\nNom : %s", pt_tete->nom);
-        pt_tete = pt_tete->suiv;
-    }
+  while(pt_tete)
+  {
+      printf("\nNom : %s", pt_tete->nom);
+      pt_tete = pt_tete->suiv;
   }
 }
 
-SYMPTOME* LireFichier(FILE *fic){
+void LireFichier(FILE *fic){
   SYMPTOME tmp;
   SYMPTOME *pt_tete = NULL;
-  SYMPTOME *pt_nouveau = NULL;
 
   fseek(fic, 0, SEEK_SET);
   memset(&tmp, '\0', sizeof(SYMPTOME));
 
   while(fread(&tmp, sizeof(SYMPTOME), 1, fic))
   {
-      if(!(pt_nouveau = (SYMPTOME*)malloc(sizeof(SYMPTOME))))
-      {
-          printf("\nErreur a la creation du maillon.");
-          break;
-      }
-      else
-      {
-          *pt_nouveau = tmp;
-          pt_nouveau->suiv = NULL;
-          //AfficherMaillon
-          memset(&tmp, '\0', sizeof(SYMPTOME));
-      }
+          //*pt_tete = tmp;
+          printf("%s\n", &(tmp.nom));
+          //AfficherMaillon(&tmp);
   }
 }
 
@@ -80,21 +68,24 @@ void EcrireFichier(FILE *fic, SYMPTOME *pt_tete)
     i = fwrite(pt_tete, sizeof(SYMPTOME), 1, fic);
     if (i != 1)
     {
-        print("\nErreur à l'écriture");
+        printf("\nErreur à l'écriture");
         break;
     }
       pt_tete = pt_tete->suiv;
   }
 }
 
-int main(void)
+int main()
 {
 
    SYMPTOME *pt_tete_symptomes, *nouvel_element = NULL;
    int fin;
 
    fin = 0;
-   while(!fin)
+
+   printf("Hope");
+
+   while(fin != 1)
    {
       int c;
 
@@ -134,13 +125,15 @@ int main(void)
             break;
 
         case '5':
+          {
+            SYMPTOME *pt_tete, *nouvel_element = NULL;
 
             bool insert = true;
 
-            pt_tete = creer_maillon();
+            pt_tete = CreerMaillon();
             char choix;
 
-            FILE *f = fopen("file.txt", "w");
+            FILE *f = fopen("bd_symptomes.txt", "a+");
             if (f == NULL)
             {
                 printf("Error opening file!\n");
@@ -149,21 +142,33 @@ int main(void)
 
             while (insert){
               printf("Voulez-vous ajouter un nouvel symptome? (o/n)");
-              //choix = getchar();
+              /choix = getchar();
               scanf(" %c", &choix);
               if (choix == 'o')
               {
-                nouvel_element = creer_maillon();
-                InsererMaillonEnTete(&nouvel_element, pt_tete);
-                EcrireFichier(f, pt_tete);
+                nouvel_element = CreerMaillon();
+                pt_tete = InsererMaillonEnTete(pt_tete, nouvel_element);
               } else {
                 insert = false;
               }
             }
 
             AfficherMaillon(pt_tete);
+            EcrireFichier(f, pt_tete);
+            //EcrireFichier(f, pt_tete);
+            fclose(f);
            //fin = 1;
            break;
+
+          }
+
+          case '6':
+          {
+            FILE *f = NULL;
+            f = fopen("bd_symptomes.txt", "r");
+            LireFichier(f);
+            fclose(f);
+          }
 
          case '0':
             fin = 1;
